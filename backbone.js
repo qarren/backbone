@@ -745,7 +745,7 @@
         }
         if (sort || (order && order.length)) this.trigger('sort', this, options);
       }
-      
+
       // Return the added (or merged) model (or models).
       return singular ? models[0] : models;
     },
@@ -1355,6 +1355,12 @@
       return fragment.replace(routeStripper, '');
     },
 
+    // Compare two strings in both original and decoded forms to account for a
+    // Firefox issue where certain characters are encoded when added to the URL.
+    compareFragments: function (fragment1, fragment2) {
+      return fragment1 === fragment2 || decodeURIComponent(fragment1) === decodeURIComponent(fragment2);
+    },
+
     // Start the hash change handling, returning `true` if the current URL matches
     // an existing route, and `false` otherwise.
     start: function(options) {
@@ -1438,10 +1444,10 @@
     // calls `loadUrl`, normalizing across the hidden iframe.
     checkUrl: function(e) {
       var current = this.getFragment();
-      if (current === this.fragment && this.iframe) {
+      if (this.compareFraments(current, this.fragment) && this.iframe) {
         current = this.getFragment(this.getHash(this.iframe));
       }
-      if (current === this.fragment) return false;
+      if (this.compareFraments(current, this.fragment)) return false;
       if (this.iframe) this.navigate(current);
       this.loadUrl();
     },
